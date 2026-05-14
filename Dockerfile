@@ -1,6 +1,7 @@
 FROM eclipse-temurin:17-jdk-alpine
 
-RUN apk update && apk add --no-cache rsync openssh
+RUN apk add --no-cache rsync openssh-client
+
 
 WORKDIR /test
 
