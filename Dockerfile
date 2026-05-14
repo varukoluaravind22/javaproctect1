@@ -6,8 +6,8 @@ WORKDIR /test
 
 ARG JAR_FILE
 
-COPY ${JAR_FILE} ${JAR_FILE}
+COPY ${JAR_FILE} test.jar
 
-EXPOSE 8083
+EXPOSE 8080
 
-CMD ["sh","-c","java -jar ${JAR_FILE}"]
+CMD ["java","-jar","test.jar"]
