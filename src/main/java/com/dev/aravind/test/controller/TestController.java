@@ -44,7 +44,7 @@ public class TestController {
                         margin-top:0;
                         letter-spacing:3px;
                     ">
-                        DevOps L2
+                        DevOps L1
                     </h2>
 
                 </div>
