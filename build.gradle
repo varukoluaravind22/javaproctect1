@@ -6,9 +6,9 @@ plugins {
 }
 sonarqube {
     properties {
-        property "sonar.projectKey", "testgradle"
-        property "sonar.projectName", "testgradle"
-        property "sonar.host.url", "http://172.21.69.225:9000/"
+        property "sonar.projectKey", "cicd"
+        property "sonar.projectName", "cicd"
+        property "sonar.host.url", "http://192.168.1.5:9000/"
     }
 }
 group = 'com.dev.aravind'
