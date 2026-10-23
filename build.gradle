@@ -6,6 +6,11 @@ plugins {
 	#owasp dependency is for SCA.
 	id 'org.owasp.dependencycheck' version '13.0.0'
 }
+#dependendency fails on cvss >=7.0
+dependencyCheck {
+    failBuildOnCVSS = 7.0
+    formats = ['HTML', 'XML']
+}
 sonarqube {
     properties {
         property "sonar.projectKey", "cicd"
