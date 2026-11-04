@@ -9,7 +9,7 @@ plugins {
 //dependendency fails on cvss >=7.0
 dependencyCheck {
 	nvd{
-		apiKey=System.getenv('nvdkey')
+		apiKey=System.getenv('NVD_API_KEY')
 	}
     failBuildOnCVSS = 7.0
     formats = ['HTML', 'XML']
