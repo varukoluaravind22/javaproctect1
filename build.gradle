@@ -18,7 +18,7 @@ sonarqube {
     properties {
         property "sonar.projectKey", "Test-project"
         property "sonar.projectName", "Test-project"
-        property "sonar.host.url", "http://127.0.0.1:9000/"
+        property "sonar.host.url", "http://sonarqube:9000/"
     }
 }
 group = 'com.dev.aravind'
