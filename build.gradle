@@ -16,9 +16,9 @@ dependencyCheck {
 }
 sonarqube {
     properties {
-        property "sonar.projectKey", "cicd"
-        property "sonar.projectName", "cicd"
-        property "sonar.host.url", "http://192.168.1.5:9000/"
+        property "sonar.projectKey", "Test-project"
+        property "sonar.projectName", "Test-project"
+        property "sonar.host.url", "http://127.0.0.1:9000/"
     }
 }
 group = 'com.dev.aravind'
