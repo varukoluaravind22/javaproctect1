@@ -14,10 +14,7 @@ dependencyCheck {
 	}
     failBuildOnCVSS = 10.0
     formats = ['HTML', 'XML']
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-
-    // Override vulnerable embedded Tomcat version
-    constraints {
+	    constraints {
         implementation('org.apache.tomcat.embed:tomcat-embed-core:11.0.25') {
             because 'Upgrade embedded Tomcat to patched version'
         }
@@ -25,6 +22,16 @@ dependencyCheck {
         implementation('org.apache.tomcat.embed:tomcat-embed-websocket:11.0.25') {
             because 'Keep embedded Tomcat WebSocket on patched version'
         }
+    }
+
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testCompileOnly 'org.projectlombok:lombok'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testAnnotationProcessor 'org.projectlombok:lombok'
     }
 
     compileOnly 'org.projectlombok:lombok'
