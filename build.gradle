@@ -6,6 +6,8 @@ plugins {
     id 'org.sonarqube' version '7.2.3.7755'
     id 'org.owasp.dependencycheck' version '13.0.0'
 }
+version = System.getenv('BUILD_NUMBER') ?: '1'
+
 
 // OWASP Dependency-Check
 dependencyCheck {
@@ -62,7 +64,9 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
-
+tasks.named('bootJar') {
+    archiveFileName = "devops-website-${version}.jar"
+}
 tasks.named('test') {
     useJUnitPlatform()
 }
