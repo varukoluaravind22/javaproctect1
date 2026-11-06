@@ -8,19 +8,33 @@ plugins {
 }
 //dependendency fails on cvss >=7.0
 dependencyCheck {
-	constraints {
-    implementation('org.apache.tomcat.embed:tomcat-embed-core:11.0.25')
-    implementation('org.apache.tomcat.embed:tomcat-embed-websocket:11.0.25')
-
-    implementation('tools.jackson.core:jackson-core:3.1.7')
-    implementation('tools.jackson.core:jackson-databind:3.1.7')
-}
 	nvd{
 		apiKey=System.getenv('NVD_API_KEY')
 		delay = 3500
 	}
     failBuildOnCVSS = 10.0
     formats = ['HTML', 'XML']
+}
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+
+    // Security dependency upgrades
+    constraints {
+        implementation('org.apache.tomcat.embed:tomcat-embed-core:11.0.25')
+        implementation('org.apache.tomcat.embed:tomcat-embed-websocket:11.0.25')
+
+        implementation('tools.jackson.core:jackson-core:3.1.7')
+        implementation('tools.jackson.core:jackson-databind:3.1.7')
+    }
+
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testCompileOnly 'org.projectlombok:lombok'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 sonarqube {
     properties {
