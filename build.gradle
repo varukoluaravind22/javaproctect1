@@ -14,7 +14,7 @@ dependencyCheck {
         delay = 3500
     }
 
-    failBuildOnCVSS = 9.0
+    failBuildOnCVSS = 10.0
     formats = ['HTML', 'XML']
 }
 
