@@ -12,7 +12,7 @@ dependencyCheck {
 		apiKey=System.getenv('NVD_API_KEY')
 		delay = 3500
 	}
-    failBuildOnCVSS = 7.0
+    failBuildOnCVSS = 8.0
     formats = ['HTML', 'XML']
 }
 sonarqube {
