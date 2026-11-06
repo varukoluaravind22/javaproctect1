@@ -1,28 +1,54 @@
+
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '4.0.8'
-	id 'io.spring.dependency-management' version '1.1.7'
-	id "org.sonarqube" version "7.2.3.7755"
-	//owasp dependency is for SCA.
-	id 'org.owasp.dependencycheck' version '13.0.0'
+    id 'java'
+    id 'org.springframework.boot' version '4.0.8'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.sonarqube' version '7.2.3.7755'
+    id 'org.owasp.dependencycheck' version '13.0.0'
 }
-//dependendency fails on cvss >=7.0
+
+// OWASP Dependency-Check
 dependencyCheck {
-	nvd{
-		apiKey=System.getenv('NVD_API_KEY')
-		delay = 3500
-	}
-    failBuildOnCVSS = 10.0
+    nvd {
+        apiKey = System.getenv('NVD_API_KEY')
+        delay = 3500
+    }
+
+    failBuildOnCVSS = 9.0
     formats = ['HTML', 'XML']
 }
+
+// SonarQube
+sonarqube {
+    properties {
+        property "sonar.projectKey", "Test-project"
+        property "sonar.projectName", "Test-project"
+        property "sonar.host.url", "http://sonarqube:9000/"
+    }
+}
+
+group = 'com.dev.aravind'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 
-    // Security dependency upgrades
+    // Tomcat security upgrade
     constraints {
         implementation('org.apache.tomcat.embed:tomcat-embed-core:11.0.25')
         implementation('org.apache.tomcat.embed:tomcat-embed-websocket:11.0.25')
 
+        // Jackson security upgrade
         implementation('tools.jackson.core:jackson-core:3.1.7')
         implementation('tools.jackson.core:jackson-databind:3.1.7')
     }
@@ -36,26 +62,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
-sonarqube {
-    properties {
-        property "sonar.projectKey", "Test-project"
-        property "sonar.projectName", "Test-project"
-        property "sonar.host.url", "http://sonarqube:9000/"
-    }
-}
-group = 'com.dev.aravind'
-version = '0.0.1-SNAPSHOT'
-
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
-}
-
-repositories {
-	mavenCentral()
-}
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
