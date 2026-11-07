@@ -43,6 +43,11 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Prometheus metrics 
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 
     // Tomcat security upgrade
