@@ -1,284 +1,97 @@
 
 package com.dev.aravind.test.controller;
 
-import java.time.Instant;
-import java.util.Map;
+import org.junit.jupiter.api.Test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.web.servlet.MockMvc;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.servlet.result.MockMvcResultMatchers.content;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+@WebMvcTest(TestController.class)
+class TestControllerTest {
 
-@RestController
-public class TestController {
+    @Autowired
+    private MockMvc mockMvc;
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(TestController.class);
+    @Test
+    void testDevops() throws Exception {
 
-    // 1. DevOps Welcome Page
-    @GetMapping(value = "/devops", produces = "text/html")
-    public String devops() {
-
-        logger.info("Received request for /devops");
-
-        try {
-
-            String response = """
-            <html>
-                <body style="
-                    margin:0;
-                    display:flex;
-                    justify-content:center;
-                    align-items:center;
-                    height:100vh;
-                    background:linear-gradient(
-                        135deg,#0f172a,#1e293b,#312e81
-                    );
-                    font-family:Arial,sans-serif;
-                ">
-
-                    <div style="
-                        text-align:center;
-                        padding:40px;
-                        border-radius:20px;
-                        background:rgba(255,255,255,0.08);
-                        box-shadow:0 8px 32px rgba(0,0,0,0.3);
-                    ">
-
-                        <h1 style="color:#f8fafc;font-size:55px;">
-                            Welcome Onboard DevOps Engineer
-                        </h1>
-
-                        <h2 style="color:#38bdf8;letter-spacing:3px;">
-                            DevOps L1
-                        </h2>
-
-                    </div>
-
-                </body>
-            </html>
-            """;
-
-            logger.info("Successfully generated DevOps welcome page");
-
-            return response;
-
-        } catch (Exception e) {
-
-            logger.error("Failed to generate DevOps welcome page", e);
-
-            throw e;
-        }
+        mockMvc.perform(get("/devops"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("text/html"));
     }
 
+    @Test
+    void testDevopsInfo() throws Exception {
 
-    // 2. DevOps Engineer Information
-    @GetMapping("/devops/info")
-    public Map<String, Object> devopsInfo() {
-
-        logger.info("Fetching DevOps engineer information");
-
-        return Map.of(
-                "role", "DevOps Engineer",
-                "level", "L1",
-                "skills", new String[]{
-                        "AWS",
-                        "Docker",
-                        "Kubernetes",
-                        "Jenkins",
-                        "Terraform",
-                        "Linux",
-                        "GitOps",
-                        "Prometheus",
-                        "Grafana"
-                },
-                "status", "Active"
-        );
+        mockMvc.perform(get("/devops/info"))
+                .andExpect(status().isOk());
     }
 
+    @Test
+    void testPipeline() throws Exception {
 
-    // 3. CI/CD Pipeline
-    @GetMapping("/devops/pipeline")
-    public Map<String, Object> pipeline() {
-
-        logger.info("Checking CI/CD pipeline status");
-
-        try {
-
-            Map<String, Object> response = Map.of(
-                    "pipeline", "Jenkins CI/CD",
-                    "source", "GitHub",
-                    "build", "Gradle",
-                    "security", "SonarQube and Trivy",
-                    "deployment", "Argo CD",
-                    "status", "SUCCESS"
-            );
-
-            logger.info("CI/CD pipeline status retrieved successfully");
-
-            return response;
-
-        } catch (Exception e) {
-
-            logger.error("Failed to retrieve CI/CD pipeline status", e);
-
-            throw e;
-        }
+        mockMvc.perform(get("/devops/pipeline"))
+                .andExpect(status().isOk());
     }
 
+    @Test
+    void testDocker() throws Exception {
 
-    // 4. Docker Information
-    @GetMapping("/devops/docker")
-    public Map<String, Object> docker() {
-
-        logger.info("Fetching Docker deployment information");
-
-        return Map.of(
-                "platform", "Docker",
-                "image", "varukoluaravind22/ci-cd",
-                "containerization", "Enabled",
-                "status", "Running"
-        );
+        mockMvc.perform(get("/devops/docker"))
+                .andExpect(status().isOk());
     }
 
+    @Test
+    void testKubernetes() throws Exception {
 
-    // 5. Kubernetes Information
-    @GetMapping("/devops/kubernetes")
-    public Map<String, Object> kubernetes() {
-
-        logger.info("Fetching Kubernetes deployment information");
-
-        try {
-
-            Map<String, Object> response = Map.of(
-                    "platform", "Kubernetes",
-                    "deployment", "devops-website",
-                    "namespace", "sit",
-                    "orchestration", "Enabled",
-                    "status", "Active"
-            );
-
-            logger.info("Kubernetes deployment information retrieved");
-
-            return response;
-
-        } catch (Exception e) {
-
-            logger.error("Failed to retrieve Kubernetes information", e);
-
-            throw e;
-        }
+        mockMvc.perform(get("/devops/kubernetes"))
+                .andExpect(status().isOk());
     }
 
+    @Test
+    void testAws() throws Exception {
 
-    // 6. AWS Cloud Information
-    @GetMapping("/devops/aws")
-    public Map<String, Object> aws() {
-
-        logger.info("Fetching AWS cloud information");
-
-        return Map.of(
-                "cloud", "AWS",
-                "services", new String[]{
-                        "EC2",
-                        "EKS",
-                        "IAM",
-                        "VPC",
-                        "S3",
-                        "RDS"
-                },
-                "infrastructure", "Cloud",
-                "status", "Configured"
-        );
+        mockMvc.perform(get("/devops/aws"))
+                .andExpect(status().isOk());
     }
 
+    @Test
+    void testMonitoring() throws Exception {
 
-    // 7. Monitoring Information
-    @GetMapping("/devops/monitoring")
-    public Map<String, Object> monitoring() {
-
-        logger.info("Fetching monitoring information");
-
-        return Map.of(
-                "monitoring", "Prometheus",
-                "visualization", "Grafana",
-                "logging", "Loki",
-                "logCollector", "Fluent Bit",
-                "status", "Configured"
-        );
+        mockMvc.perform(get("/devops/monitoring"))
+                .andExpect(status().isOk());
     }
 
+    @Test
+    void testGitops() throws Exception {
 
-    // 8. GitOps Information
-    @GetMapping("/devops/gitops")
-    public Map<String, Object> gitops() {
-
-        logger.info("Fetching GitOps deployment information");
-
-        return Map.of(
-                "tool", "Argo CD",
-                "repository", "GitHub",
-                "deployment", "devops-website",
-                "namespace", "sit",
-                "strategy", "GitOps",
-                "status", "Configured"
-        );
+        mockMvc.perform(get("/devops/gitops"))
+                .andExpect(status().isOk());
     }
 
+    @Test
+    void testHealth() throws Exception {
 
-    // 9. Application Health
-    @GetMapping("/devops/health")
-    public Map<String, Object> health() {
-
-        logger.info("Application health endpoint accessed");
-
-        return Map.of(
-                "application", "devops-website",
-                "status", "UP",
-                "timestamp", Instant.now().toString()
-        );
+        mockMvc.perform(get("/devops/health"))
+                .andExpect(status().isOk());
     }
 
+    @Test
+    void testWarning() throws Exception {
 
-    // 10. Warning Log
-    @GetMapping("/devops/warning")
-    public Map<String, Object> warning() {
-
-        logger.warn("DevOps warning endpoint accessed");
-
-        return Map.of(
-                "message", "This endpoint generates a warning log",
-                "level", "WARN"
-        );
+        mockMvc.perform(get("/devops/warning"))
+                .andExpect(status().isOk());
     }
 
+    @Test
+    void testError() throws Exception {
 
-    // 11. Error Log Testing
-    @GetMapping("/devops/error")
-    public ResponseEntity<Map<String, Object>> error() {
-
-        logger.error("DevOps error testing endpoint accessed");
-
-        try {
-
-            throw new RuntimeException(
-                    "Simulated DevOps application error"
-            );
-
-        } catch (RuntimeException e) {
-
-            logger.error("Simulated application error occurred", e);
-
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of(
-                            "status", "ERROR",
-                            "message", "Simulated application error"
-                    ));
-        }
+        mockMvc.perform(get("/devops/error"))
+                .andExpect(status().isInternalServerError());
     }
 }
