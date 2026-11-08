@@ -1,97 +1,32 @@
 
-package com.dev.aravind.test.controller;
+package com.dev.aravind.test;
 
-import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.EventListener;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.servlet.result.MockMvcResultMatchers.content;
+@SpringBootApplication
+public class TestApplication {
 
-@WebMvcTest(TestController.class)
-class TestControllerTest {
+    private static final Logger logger =
+            LoggerFactory.getLogger(TestApplication.class);
 
-    @Autowired
-    private MockMvc mockMvc;
+    public static void main(String[] args) {
 
-    @Test
-    void testDevops() throws Exception {
+        logger.info("Starting DevOps Website Application");
 
-        mockMvc.perform(get("/devops"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith("text/html"));
+        SpringApplication.run(TestApplication.class, args);
+
+        logger.info("DevOps Website Application started successfully");
     }
 
-    @Test
-    void testDevopsInfo() throws Exception {
+    @EventListener
+    public void applicationShutdown(ContextClosedEvent event) {
 
-        mockMvc.perform(get("/devops/info"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testPipeline() throws Exception {
-
-        mockMvc.perform(get("/devops/pipeline"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testDocker() throws Exception {
-
-        mockMvc.perform(get("/devops/docker"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testKubernetes() throws Exception {
-
-        mockMvc.perform(get("/devops/kubernetes"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testAws() throws Exception {
-
-        mockMvc.perform(get("/devops/aws"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testMonitoring() throws Exception {
-
-        mockMvc.perform(get("/devops/monitoring"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testGitops() throws Exception {
-
-        mockMvc.perform(get("/devops/gitops"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testHealth() throws Exception {
-
-        mockMvc.perform(get("/devops/health"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testWarning() throws Exception {
-
-        mockMvc.perform(get("/devops/warning"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testError() throws Exception {
-
-        mockMvc.perform(get("/devops/error"))
-                .andExpect(status().isInternalServerError());
+        logger.warn("DevOps Website Application is shutting down");
     }
 }
