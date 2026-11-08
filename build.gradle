@@ -64,8 +64,10 @@ dependencies {
     // Spring Boot Actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    // Prometheus metrics 
+    // Prometheus metrics
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+    // Spring Web MVC
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 
     // Tomcat security upgrade
@@ -82,11 +84,14 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // Spring Boot MVC Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+
     testCompileOnly 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
+
 tasks.named('bootJar') {
     archiveFileName = "devops-website-${version}.jar"
 }
