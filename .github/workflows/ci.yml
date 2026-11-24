@@ -93,15 +93,6 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Publish JUnit Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: junit-test-results-${{ github.run_attempt }}
-          path: build/test-results/test/*.xml
-          if-no-files-found: ignore
-          retention-days: 7
-
         # 5. SonarQube SAST Analysis
       - name: SonarQube Code Quality Analysis
         env:
