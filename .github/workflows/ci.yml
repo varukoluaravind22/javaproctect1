@@ -54,6 +54,13 @@ jobs:
           git --version
           docker --version
           trivy --version
+          
+      - name: Check Gradle Distribution Connectivity
+        run: |
+          curl -I -L \
+            --connect-timeout 30 \
+            --max-time 60 \
+            https://services.gradle.org/distributions/gradle-9.4.1-bin.zip
         # 4. Build and Unit Test
       - name: Build and Unit Test
         run: |
