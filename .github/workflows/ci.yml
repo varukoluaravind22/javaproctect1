@@ -46,6 +46,13 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+            # Install Trivy
+      - name: Setup Trivy
+        uses: aquasecurity/setup-trivy@v0.3.1
+        with:
+          version: v0.68.2
+          cache: true
+
       # 3. Check Tools
       - name: Check Tools
         run: |
