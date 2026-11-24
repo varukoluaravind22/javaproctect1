@@ -65,15 +65,27 @@ jobs:
         with:
           name: application-jar
           path: |
-            - name: Publish JUnit Test Results
+            build/libs/*.jar
+            !build/libs/*-plain.jar
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Publish JUnit Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: junit-test-results
           path: build/test-results/test/*.xml
-          if-no-files-found: ignorebuild/libs/*.jar
-            !build/libs/*-plain.jar
-          if-no-files-found: error
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Publish JUnit Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-test-results
+          path: build/test-results/test/*.xml
+          if-no-files-found: ignore
           retention-days: 7
 
         # 5. SonarQube SAST Analysis
