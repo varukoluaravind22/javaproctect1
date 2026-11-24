@@ -1,10 +1,209 @@
-name: Actions Runner Controller Demo
+name: DevOps CI-CD Pipeline
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
+concurrency:
+  group: devops-website-pipeline
+  cancel-in-progress: false
 jobs:
-  Explore-GitHub-Actions: 
-    # You need to use the INSTALLATION_NAME from the previous step
+  build-and-deploy:
+    name: Build, Scan and Deploy
     runs-on: gha-runner-scale-set
+    env:
+      DOCKER_REPO: varukoluaravind22/ci-cd
+      GITOPS_REPO: varukoluaravind22/argocd-sit-yamls
+      GITOPS_BRANCH: main
+      GITOPS_FILE: sit/devops-sit-website.yml
+      
     steps:
-    - run: echo "🎉 This job uses runner scale set runners!"
+      - name: Git Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Generate Docker Image Tag
+        id: version
+        shell: bash
+        run: |
+          GIT_COMMIT_SHORT=$(git rev-parse --short HEAD)
+          IMAGE_TAG="${GITHUB_RUN_NUMBER}-${GIT_COMMIT_SHORT}"
+
+          echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
+
+          echo "Git Commit: $GIT_COMMIT_SHORT"
+          echo "Docker Image Tag: $IMAGE_TAG"
+          
+      # 2. Setup Java and Gradle
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # 3. Check Tools
+      - name: Check Tools
+        run: |
+          java --version
+          ./gradlew --version
+          git --version
+          docker --version
+          trivy --version
+        # 4. Build and Unit Test
+      - name: Build and Unit Test
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build
+
+      - name: Archive JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-jar
+          path: |
+            - name: Publish JUnit Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-test-results
+          path: build/test-results/test/*.xml
+          if-no-files-found: ignorebuild/libs/*.jar
+            !build/libs/*-plain.jar
+          if-no-files-found: error
+          retention-days: 7
+
+        # 5. SonarQube SAST Analysis
+      - name: SonarQube Code Quality Analysis
+        env:
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          ./gradlew sonar
+
+        # 6. SonarQube Quality Gate
+      - name: SonarQube Quality Gate
+        uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+        with:
+          pollingTimeoutSec: 300
+
+      # 7. OWASP Dependency Check - SCA
+      - name: Dependency Vulnerability Scan
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: |
+          ./gradlew dependencyCheckAnalyze \
+            -Pnvd.apiKey="$NVD_API_KEY" \
+            --info
+
+      - name: Archive Dependency Check Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: build/reports/dependency-check-report.html
+          if-no-files-found: ignore
+          retention-days: 7
+
+      # 8. Trivy Filesystem Scan
+      - name: Trivy Filesystem Scan
+        run: |
+          trivy fs \
+            --scanners vuln,secret \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            .
+
+      # 9. Docker Build
+      - name: Docker Image Build
+        run: |
+          JAR_FILE=$(find build/libs -maxdepth 1 -name '*.jar' \
+            ! -name '*-plain.jar' | head -n 1)
+
+          echo "Selected JAR: $JAR_FILE"
+
+          docker build \
+            --build-arg JAR_FILE="$JAR_FILE" \
+            -t "${DOCKER_REPO}:Devops-Test-Website-${IMAGE_TAG}" .
+
+      # 10. Trivy Docker Image Scan
+      - name: Trivy Docker Image Scan
+        run: |
+          trivy image \
+            --timeout 15m \
+            --severity HIGH,CRITICAL \
+            "${DOCKER_REPO}:Devops-Test-Website-${IMAGE_TAG}"
+
+      # 11. Push Image to Docker Hub
+      - name: Push Image to Docker Hub
+        env:
+          DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login \
+            -u "$DOCKER_USER" \
+            --password-stdin
+
+          docker push \
+            "${DOCKER_REPO}:Devops-Test-Website-${IMAGE_TAG}"
+
+          echo "IMAGE_URI=${DOCKER_REPO}:Devops-Test-Website-${IMAGE_TAG}" \
+            > image.env
+
+          docker logout
+
+      - name: Archive Docker Image Information
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-info
+          path: image.env
+
+      # 12. Update GitOps Repository
+      - name: Checkout GitOps Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.GITOPS_REPO }}
+          ref: ${{ env.GITOPS_BRANCH }}
+          token: ${{ secrets.GITOPS_TOKEN }}
+          path: gitops
+
+      - name: Update GitOps Deployment
+        working-directory: gitops
+        run: |
+          set -e
+
+          NEW_IMAGE="${DOCKER_REPO}:Devops-Test-Website-${IMAGE_TAG}"
+
+          echo "Updating image to: $NEW_IMAGE"
+
+          sed -i \
+            "/- name: devops-website/{n;s|image:.*|image: $NEW_IMAGE|;}" \
+            "$GITOPS_FILE"
+
+          echo "Updated image:"
+          grep -A 2 -- "- name: devops-website" "$GITOPS_FILE"
+
+          git config user.name "varukoluaravind22"
+          git config user.email "varukoluaravind22@gmail.com"
+
+          git add "$GITOPS_FILE"
+
+          if git diff --cached --quiet; then
+            echo "No changes detected."
+          else
+            git commit -m "Update devops-website image to ${IMAGE_TAG}"
+            git push origin "$GITOPS_BRANCH"
+          fi
+
+          echo "GitOps repository updated successfully."
+
+
+        
+          
